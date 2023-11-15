@@ -15,7 +15,7 @@ For the operation of the final method, it is recommended to load the data as the
 
 
 def harversin_distance_2points(latA, lonA, latB, lonB):
-    r = 6371  # earth radius (km)
+    r = 6371  # 地球半径,km
     latA = latA * math.pi / 180
     lonA = lonA * math.pi / 180
     latB = latB * math.pi / 180
@@ -23,9 +23,9 @@ def harversin_distance_2points(latA, lonA, latB, lonB):
     if latA == latB and lonA == lonB:
         distance_nm = 0
     else:
-        distance_km = r * math.acos(math.sin(lonA) * math.sin(lonB) + math.cos(lonA) * math.cos(lonB) *
-                                    math.cos(latB - latA))
-        distance_nm = distance_km / 1.852  # Convert to nautical miles
+        distance_km = 2 * r * math.asin(math.sqrt(
+            math.sin((latB - latA) / 2) ** 2 + math.cos(latA) * math.cos(latB) * math.sin((lonB - lonA) / 2) ** 2))
+        distance_nm = distance_km / 1.852  # 转换成海里
     return distance_nm
 
 
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         """
         parameter setting
         """
-        window_size = 10
+        window_size = 20
         step = 3
         para_c = 1.47
         para_std = 0.02

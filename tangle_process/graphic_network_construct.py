@@ -4,6 +4,19 @@ import networkx as nx
 from clac_angelrate_algorithm import cal_window_wtr
 
 
+def generate_L_matrix(window_size):
+    L = np.zeros((window_size, window_size))
+
+    for i in range(window_size):
+        for j in range(window_size):
+            if i == j:
+                L[i, j] = 2
+            elif abs(i - j) == 1:
+                L[i, j] = -1
+
+    return L
+
+
 def compute_window_variation(tangle_total, path_op, lon_index, lat_index, time_index, traj_tuple, L_max, L_min, para_c):
     """
     Calculate window variation
@@ -48,16 +61,7 @@ def compute_total_variation(data_net, traj_tuple, wtrs, window_size, step):
         for j, indicator in enumerate(wtrs[n:n + window_size]):
             graph.nodes[j + n]['wtr'] = indicator
 
-        L = np.array([[1, -1, 0, 0, 0, 0, 0, 0, 0, 0],
-                      [-1, 2, -1, 0, 0, 0, 0, 0, 0, 0],
-                      [0, -1, 2, -1, 0, 0, 0, 0, 0, 0],
-                      [0, 0, -1, 2, -1, 0, 0, 0, 0, 0],
-                      [0, 0, 0, -1, 2, -1, 0, 0, 0, 0],
-                      [0, 0, 0, 0, -1, 2, -1, 0, 0, 0],
-                      [0, 0, 0, 0, 0, -1, 2, -1, 0, 0],
-                      [0, 0, 0, 0, 0, 0, -1, 2, -1, 0],
-                      [0, 0, 0, 0, 0, 0, 0, -1, 2, -1],
-                      [0, 0, 0, 0, 0, 0, 0, 0, -1, 1]])
+        L = generate_L_matrix(window_size)
         WTR = np.array([graph.nodes[i]['wtr'] for i in graph.nodes()])
         total_variation = np.matmul(np.matmul(WTR.T, L), WTR)
         total_variation_list.append(total_variation)
@@ -67,7 +71,7 @@ def compute_total_variation(data_net, traj_tuple, wtrs, window_size, step):
     for k, node in enumerate(traj_tuple[(len(data_net) - window_size) - (len(data_net) - window_size) % step:]):
         graph_tail.add_node(k, pos=node)
         if k < len(traj_tuple[(len(data_net) - window_size) - (
-                len(data_net) - window_size) % step:]) - 1:
+            len(data_net) - window_size) % step:]) - 1:
             graph_tail.add_edge(k, k + 1)
     for j, indicator in enumerate(wtrs[(len(data_net) - window_size) - (len(data_net) - window_size) % step:]):
         graph_tail.nodes[j]['wtr'] = indicator
